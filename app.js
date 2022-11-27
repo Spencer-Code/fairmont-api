@@ -25,6 +25,14 @@ app.get("/", (req, res) =>{
    res.send("<h1>hi</h1>")
 });
 
+app.post("/register", (req, res) =>{
+    // register
+});
+
+app.post("/login", (req, res) =>{
+    // login
+});
+
 app.listen(5001, () => {
     console.log("Server Started 5001");
 });
