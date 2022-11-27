@@ -1,1 +1,2 @@
-# fairmont-api API server for interacting with MySQL Database.
+# fairmont-api 
+# An API server to interact with a MySQL Database.
