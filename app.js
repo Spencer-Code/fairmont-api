@@ -84,13 +84,3 @@ app.get("/profile/:id", (req, res) => {
 app.listen(5001, () => {
     console.log("Server Started 5001");
 });
-
-
-
-// // Load hash from your password DB.
-// bcrypt.compare("bacon", hash, function(err, res) {
-//     // res == true
-// });
-// bcrypt.compare("veggies", hash, function(err, res) {
-//     // res = false
-// });
