@@ -81,6 +81,26 @@ app.get("/profile/:id", (req, res) => {
     }).catch(err => res.status(400).json('error getting user'));
 });
 
+app.post("/newsletter", (req, res) =>{
+    const emailInput = req.body.email;
+    console.log(emailInput)
+    db('newsletter').insert({email: emailInput})
+    .then(() => {
+        res.json('success') 
+    })
+    .catch(error => 
+        { res.json('success') 
+    });
+});
+
+app.get("/newsletterJson", async (req, res) =>{
+    const emails = await db('newsletter').select('email');
+    const userEmails = await db('users').select('email');
+    const combined = [].concat(emails, userEmails);
+    res.json(combined);
+
+});
+
 app.listen(5001, () => {
     console.log("Server Started 5001");
 });
