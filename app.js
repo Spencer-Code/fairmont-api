@@ -81,9 +81,56 @@ app.get("/profile/:id", (req, res) => {
     }).catch(err => res.status(400).json('error getting user'));
 });
 
+app.get("/users", (req, res) =>{
+    db.select('*').from('users')
+        .then(users => {
+            res.json(users);
+        }).catch(err => res.status(400).json('error getting users'));
+});
+
+app.post("/updateUser", (req, res) => {
+    //Usual destructuring wasn't working. Used the long winded way.
+    const userId = req.body.id;
+    const fName = req.body.first_name;
+    const lName= req.body.last_name;
+    const userEmail = req.body.email;
+    const userPermission = req.body.permission;
+
+    console.log(userId)
+    console.log(fName)
+    console.log(lName)
+    console.log(userEmail)
+    console.log(userPermission)
+
+    db('users')
+        .where({id : userId})
+        .update({
+            first_name : fName,
+            last_name: lName,
+            email: userEmail,
+            permission: userPermission
+        }).then(() => {
+            res.json({result: 'success'});
+        }).catch(error => 
+            { res.json({result: 'error'}) 
+        });
+});
+
+app.post("/deleteUser", async (req, res) => {
+    const reqEmail = req.body.email;
+    console.log(req.body.email)
+
+    try{
+        await db('login').where({ email: reqEmail}).del()
+        await db('users').where({ email: reqEmail}).del()
+        res.json('deleted')
+    } catch(e){
+        res.json('cannot delete')
+    }
+})
+
 app.post("/newsletter", (req, res) =>{
     const emailInput = req.body.email;
-    console.log(emailInput)
     db('newsletter').insert({email: emailInput})
     .then(() => {
         res.json('success') 
@@ -96,10 +143,52 @@ app.post("/newsletter", (req, res) =>{
 app.get("/newsletterJson", async (req, res) =>{
     const emails = await db('newsletter').select('email');
     const userEmails = await db('users').select('email');
-    const combined = [].concat(emails, userEmails);
+    let combined = [].concat(emails, userEmails);
+    combined = [... new Set(combined.map(JSON.stringify))].map(JSON.parse)
+    console.log(combined)
     res.json(combined);
 
 });
+
+app.get("/supportLinks", (req, res) =>{
+    db.select('*').from('support_links')
+        .then(links => {
+            res.json(links);
+        }).catch(err => res.status(400).json('error getting users'));
+});
+
+app.post("/updateSupportLink", (req, res) => {
+    //Usual destructuring wasn't working. Used the long winded way.
+    const linkId = req.body.id;
+    const siteName = req.body.site_name;
+    const siteUrl= req.body.url;
+
+    console.log(linkId)
+    console.log(siteName)
+    console.log(siteUrl)
+
+    db('support_links')
+        .where({id : linkId})
+        .update({
+            site_name : siteName,
+            url: siteUrl
+        }).then(() => {
+            res.json({result: 'success'});
+        }).catch(error => 
+            { res.json({result: 'error'}) 
+        });
+});
+
+app.post("/deleteSupportLink", async (req, res) => {
+    const reqId = req.body.id;
+
+    try{
+        await db('support_links').where({ id: reqId}).del()
+        res.json('deleted')
+    } catch(e){
+        res.json('cannot delete support link')
+    }
+})
 
 app.listen(5001, () => {
     console.log("Server Started 5001");
