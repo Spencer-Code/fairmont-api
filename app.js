@@ -30,7 +30,6 @@ app.get("/", (req, res) =>{
 app.post("/register", (req, res) =>{
     const {fName, lName, email, password} = req.body;
     const hash = bcrypt.hashSync(password);
-    console.log(hash)
     db('login').insert({
         hashed_password: hash,
         email: email
@@ -53,11 +52,9 @@ app.post("/login", (req, res) =>{
         .where('email', req.body.email)
         .then(data =>{
             const isValid = bcrypt.compareSync(req.body.password, data[0].hashed_password);
-            console.log(isValid)
             if (isValid){
                 return db('users').select('*').where('email', req.body.email)
                 .then(user =>{
-                    console.log(user[0])
                     res.json(user[0])
                 })
                 // .catch(err = res.status(400).json('unable to get user'))
@@ -72,7 +69,6 @@ app.get("/profile/:id", (req, res) => {
     db.select('*').from('users').where({
         id: id
     }).then(user => {
-        console.log(user);
         if(user.length){
             res.json(user[0]);
         } else {
@@ -96,12 +92,6 @@ app.post("/updateUser", (req, res) => {
     const userEmail = req.body.email;
     const userPermission = req.body.permission;
 
-    console.log(userId)
-    console.log(fName)
-    console.log(lName)
-    console.log(userEmail)
-    console.log(userPermission)
-
     db('users')
         .where({id : userId})
         .update({
@@ -118,7 +108,6 @@ app.post("/updateUser", (req, res) => {
 
 app.post("/deleteUser", async (req, res) => {
     const reqEmail = req.body.email;
-    console.log(req.body.email)
 
     try{
         await db('login').where({ email: reqEmail}).del()
@@ -145,7 +134,6 @@ app.get("/newsletterJson", async (req, res) =>{
     const userEmails = await db('users').select('email');
     let combined = [].concat(emails, userEmails);
     combined = [... new Set(combined.map(JSON.stringify))].map(JSON.parse)
-    console.log(combined)
     res.json(combined);
 
 });
@@ -162,10 +150,6 @@ app.post("/updateSupportLink", (req, res) => {
     const linkId = req.body.id;
     const siteName = req.body.site_name;
     const siteUrl= req.body.url;
-
-    console.log(linkId)
-    console.log(siteName)
-    console.log(siteUrl)
 
     db('support_links')
         .where({id : linkId})
@@ -187,6 +171,21 @@ app.post("/deleteSupportLink", async (req, res) => {
         res.json('deleted')
     } catch(e){
         res.json('cannot delete support link')
+    }
+})
+
+app.post("/insertSupportLink", async (req, res) => {
+    const siteName = req.body.site_name;
+    const siteUrl = req.body.url;
+    
+    try{
+        await db('support_links').insert({
+            site_name: siteName,
+            url : siteUrl
+        })
+        res.json('inserted')
+    } catch(e){
+        res.json('cannot insert support link')
     }
 })
 
