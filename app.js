@@ -89,20 +89,25 @@ app.post("/updateUser", (req, res) => {
     const userId = req.body.id;
     const fName = req.body.first_name;
     const lName= req.body.last_name;
-    const userEmail = req.body.email;
-    const userPermission = req.body.permission;
+    const newEmail = req.body.email;
+    const oldEmail = req.body.old_email;
+    const userPermission = req.body.permission; 
 
     db('users')
         .where({id : userId})
         .update({
-            first_name : fName,
+            first_name: fName,
             last_name: lName,
-            email: userEmail,
+            email: newEmail,
             permission: userPermission
+        }).then(()=>{
+            return db('login')
+                .where({email : oldEmail})
+                .update({email: newEmail})
         }).then(() => {
             res.json({result: 'success'});
         }).catch(error => 
-            { res.json({result: 'error'}) 
+            { res.json(error) 
         });
 });
 
