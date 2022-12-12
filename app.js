@@ -194,6 +194,26 @@ app.post("/insertSupportLink", async (req, res) => {
     }
 })
 
+app.post("/chatroom", (req, res) =>{
+    const {email, message} = req.body;
+
+    db('message').insert({
+        email: email,
+        message: message
+    })
+    .then(response => {
+        res.json(response)    
+    
+    }).catch(error => res.status(400).json(error));
+});
+
+app.get("/chatmessagepull", (req, res) =>{
+    db.select('*').from('message')
+    .then(message => {
+        console.log(message);
+        res.json(message)
+    }).catch(err => res.status(400).json('error getting message'));
+});
 app.listen(5001, () => {
     console.log("Server Started 5001");
 });
